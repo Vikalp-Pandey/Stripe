@@ -1,0 +1,10 @@
+# Ignore build and dependency directories
+dist
+node_modules
+
+# Ignore environment variable files
+.env.local
+stripe.exe
+pnpm-lock.yaml
+
+
