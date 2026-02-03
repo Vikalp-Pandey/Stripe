@@ -6,10 +6,11 @@ type handlerFn = (
   next: NextFunction
 ) => any | Promise<any>| Promise<void>;
 
-export const asyncHandler =  (fn:handlerFn, finallyBlock?:any) => {
 
+
+export const asyncHandler =  (fn:handlerFn, finallyBlock?:any) => {
     // It returns a whole controller function 
-    return  async (req:Request,res:Response,next:NextFunction) => {
+        return  async (req:Request,res:Response,next:NextFunction) => {
                 try{
                     return await Promise.resolve(fn(req,res,next));
                 }catch(error){
@@ -24,10 +25,12 @@ export const asyncHandler =  (fn:handlerFn, finallyBlock?:any) => {
                         }
                     }
                 }
+        }
     }
-}
+    
 
 
+// export const asyncHandler = 
 export const sendResponse = (
   res: Response,
   statusCode: number,
@@ -74,6 +77,8 @@ export const sendRedirect = (
 
     redirectUrl += url.includes("?") ? `&${params}` : `?${params}`;
   }
+
+
   return res.redirect(statusCode, redirectUrl);
 };
 
@@ -82,8 +87,6 @@ export const logger = ( messageInfo:"INFO"|"ERROR",detail:string, message?:unkno
     if (message){
       console.log(message);
     } 
-    
-     
 }
 
 

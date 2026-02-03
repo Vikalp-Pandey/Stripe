@@ -1,6 +1,6 @@
-import stripeConnectController from "@/controllers/connect.controller";
-import paymentController from "@/controllers/payment.controller";
-import webhookController from "@/controllers/webhook.controller";
+import stripeConnectController from "@/controllers/stripeControllers/connect.controller";
+import paymentController from "@/controllers/stripeControllers/payment.controller";
+import webhookController from "@/controllers/stripeControllers/webhook.controller";
 import { Router } from "express";
 import express from "express";
 

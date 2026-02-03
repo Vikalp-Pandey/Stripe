@@ -1,7 +1,7 @@
 import env from "@/env";
 import { asyncHandler, logger, sendResponse } from "@/handlers/handler";
 import {Request,Response} from "express";
-import {stripe} from "../services/payment/stripe";
+import {stripe} from "../../services/payment/stripe";
 
 export const webhooks = asyncHandler(async(req:Request,res:Response)=>{
     const sig = req.headers['stripe-signature']

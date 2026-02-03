@@ -3,6 +3,7 @@ import cors from 'cors';
 import express from 'express';
 import { connectToMongoDb } from './db/db';
 import { logger } from './handlers/handler';
+import authRoutes from './routes/authRoutes/auth.routes'
 import paymentRoutes from './routes/payment.routes';
 import webhookRoutes from './routes/webhook.routes';
 
@@ -21,6 +22,7 @@ app.use(
 
 connectToMongoDb(env.DATABASE_URL);
 
+app.use('/api/auth',authRoutes);
 app.use('/api/payment',paymentRoutes);
 
 app.listen(env.PORT, () => {

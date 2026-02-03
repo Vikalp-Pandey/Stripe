@@ -26,10 +26,27 @@ const envSchema = z.object({
     .transform((val) => parseInt(val, 10)),
 
 
+  // Jwt Secret Keys
+  ACCESS_SECRET:z.string(),
+  // REFRESH_SECRET:z.string(),
+  ACCESS_SECRET_TTL:z.string(),
+  // REFRESH_SECRET_TTL:z.string(),
+
+
   // Stripe Api Keys
   STRIPE_SECRET_KEY: z.string(),
   STRIPE_PUBLISHABLE_KEY: z.string(),
   STRIPE_WEBHOOK_SECRET:z.string(),
+
+  // Github OAuth Credentials
+  GITHUB_CLIENT_ID:z.string(),
+  GITHUB_CLIENT_SECRET:z.string(),
+  GITHUB_REDIRECT_URI:z.string(),
+  // Google OAuth Credentials
+  GOOGLE_CLIENT_ID:z.string(),
+  GOOGLE_CLIENT_SECRET:z.string(),
+  GOOGLE_REDIRECT_URI:z.string()
+  
 });
 
 const { data, success, error } = envSchema.safeParse(process.env);
