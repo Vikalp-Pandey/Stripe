@@ -1,7 +1,7 @@
 import { asyncHandler, logger, sendRedirect, sendResponse } from "@/handlers/handler";
 import stripeService from "@/services/payment/stripe.connect";
 import {Request,Response} from "express";
-import { success } from "zod";
+
 
 export const onboardSeller = asyncHandler( async (req:Request,res:Response) => {
    const {email} = req.body;
@@ -32,8 +32,12 @@ export const refreshOnBoarding = asyncHandler(async (req:Request,res:Response)  
 
 export const getAccountStatus = asyncHandler(async (req:Request,res:Response) => {
     const {accountId}= req.params;
-    const status = await stripeService.getAccountStatus(accountId);
-    return sendResponse(res,200,"Account Status",status);
+    if (typeof accountId =="string"){
+        const status = await stripeService.getAccountStatus(accountId);
+        return sendResponse(res,200,"Account Status",status);
+    }
+    return sendResponse(res,400,"Invalid String Type")
+    
 });
 
 export const createPaymentIntent = asyncHandler(async (req:Request,res:Response) => {
