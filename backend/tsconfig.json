@@ -1,19 +1,19 @@
 {
   "compilerOptions": {
-    "jsx": "react",
-    "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "Nodenext",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
+    "target": "ES2020",
+    "module": "CommonJS",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
     "types": ["node"],
-    "lib": ["ESNext"],
-    "outDir": "dist",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "forceConsistentCasingInFileNames":true
+    "forceConsistentCasingInFileNames": true
   }
 }
+
+

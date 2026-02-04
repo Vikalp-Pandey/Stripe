@@ -1,7 +1,7 @@
-import { asyncHandler, logger, sendRedirect, sendResponse } from "@/handlers/handler";
-import oauthService from "@/services/auth/oauth.service";
-import userService from "@/services/auth/user.service";
-import axios from "axios";
+import { asyncHandler, logger, sendRedirect, sendResponse } from "../../handlers/handler";
+import oauthService from "../../services/auth/oauth.service";
+import userService from "../../services/auth/user.service";
+
 import { Request,Response,NextFunction } from "express";
 
 

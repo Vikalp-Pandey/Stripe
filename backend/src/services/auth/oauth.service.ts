@@ -1,6 +1,6 @@
-import env from "@/env"
-import { logger } from "@/handlers/handler"
-import { accountType } from "@/models/authModels/user.model"
+import env from "../../env"
+import { logger } from "../../handlers/handler"
+import { accountType } from "../../models/authModels/user.model"
 import axios from "axios"
 
 const getGithubURL = async()=>{

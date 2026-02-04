@@ -1,5 +1,5 @@
-import { asyncHandler, logger, sendRedirect, sendResponse } from "@/handlers/handler";
-import stripeService from "@/services/payment/stripe.connect";
+import { asyncHandler, logger, sendRedirect, sendResponse } from "../../handlers/handler";
+import stripeService from "../../services/payment/stripe.connect";
 import {Request,Response} from "express";
 
 

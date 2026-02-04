@@ -1,5 +1,5 @@
-import jwtAuthController from "@/controllers/authControllers/jwtAuth.controller";
-import oauthController from "@/controllers/authControllers/oauth.controller";
+import jwtAuthController from "../../controllers/authControllers/jwtAuth.controller";
+import oauthController from "../../controllers/authControllers/oauth.controller";
 import { Router } from "express";
 
 const router = Router();

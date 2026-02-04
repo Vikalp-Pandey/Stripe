@@ -1,5 +1,5 @@
-import env from "@/env";
-import { asyncHandler, logger, sendResponse } from "@/handlers/handler";
+import env from "../../env";
+import { asyncHandler, logger, sendResponse } from "../../handlers/handler";
 import {Request,Response} from "express";
 import {stripe} from "../../services/payment/stripe";
 

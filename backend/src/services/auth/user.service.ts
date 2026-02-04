@@ -1,6 +1,6 @@
-import { logger } from "@/handlers/handler";
-import User, { userSchema } from "@/models/authModels/user.model";
-import { create } from "domain";
+
+import User, { userSchema } from "../../models/authModels/user.model";
+
 
 export const createUser = async(user:userSchema) => {
     const isExisting = await User.findOne({email:user.email})

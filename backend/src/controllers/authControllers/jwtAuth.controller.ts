@@ -1,8 +1,8 @@
-import env from "@/env";
-import { asyncHandler, logger, sendResponse } from "@/handlers/handler";
-import { accountType } from "@/models/authModels/user.model";
-import jwtService from "@/services/auth/jwt.service";
-import userService from "@/services/auth/user.service";
+import env from "../../env";
+import { asyncHandler, logger, sendResponse } from "../../handlers/handler";
+import { accountType } from "../../models/authModels/user.model";
+import jwtService from "../../services/auth/jwt.service";
+import userService from "../../services/auth/user.service";
 import { Request,Response,NextFunction } from "express";
 
 export const signupUser = asyncHandler(async (req:Request,res:Response,next:NextFunction) => {

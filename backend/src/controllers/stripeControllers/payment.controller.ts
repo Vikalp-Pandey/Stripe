@@ -1,5 +1,5 @@
 
-import paymentService from "@/services/payment/stripe";
+import paymentService from "../../services/payment/stripe";
 import { Request,Response,NextFunction } from "express";
 
 export const checkoutSession = async (req:Request,res:Response,next:NextFunction) => {
