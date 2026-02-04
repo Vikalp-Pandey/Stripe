@@ -26,8 +26,11 @@ export const onboardingSuccessRedirect = asyncHandler(async (req: Request, res: 
 
 export const refreshOnBoarding = asyncHandler(async (req:Request,res:Response)  => {
     const { accountId } = req.params;
-    const link = await stripeService.createAccountLink(accountId);
-    return sendResponse(res,200,"Account Refreshed Successfully", {onBoarding:link})
+    if (typeof accountId =="string"){
+        const link = await stripeService.createAccountLink(accountId);
+        return sendResponse(res,200,"Account Refreshed Successfully", {onBoarding:link})
+    }
+    return sendResponse(res,400,"Invalid AccountId Type")
 })
 
 export const getAccountStatus = asyncHandler(async (req:Request,res:Response) => {
@@ -36,7 +39,7 @@ export const getAccountStatus = asyncHandler(async (req:Request,res:Response) =>
         const status = await stripeService.getAccountStatus(accountId);
         return sendResponse(res,200,"Account Status",status);
     }
-    return sendResponse(res,400,"Invalid String Type")
+    return sendResponse(res,400,"Invalid AccountId Type")
     
 });
 
