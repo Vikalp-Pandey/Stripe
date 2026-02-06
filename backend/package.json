@@ -5,7 +5,7 @@
   "scripts": {
   "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
   "build": "tsc",
-  "start": "node dist/index.js"
+  "start": "ts-node -r tsconfig-paths/register src/index.ts"
 },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.955.0",
