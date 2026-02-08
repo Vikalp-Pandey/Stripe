@@ -26,12 +26,12 @@ export default function SigninForm() {
   };
 
   const handleGithubSignin = () => {
-    const baseUrl = import.meta.env.BASE_BACKEND_URL
+    const baseUrl = import.meta.env.VITE_BASE_BACKEND_URL
     window.location.href = `${baseUrl}/api/auth/github` ; // backend OAuth route
   };
 
   const handleGoogleSignin = () => {
-    const baseUrl = import.meta.env.BASE_BACKEND_URL
+    const baseUrl = import.meta.env.VITE_BASE_BACKEND_URL
     window.location.href = `${baseUrl}/api/auth/google`; // backend OAuth route
   };
 

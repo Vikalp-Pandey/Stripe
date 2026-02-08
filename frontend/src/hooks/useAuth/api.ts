@@ -29,7 +29,7 @@ export const signinSchema = z.object({
 export type SigninFormValues = z.infer<typeof signinSchema>;
 
 export const signinUser = async (data: SigninFormValues) => {
-  const baseUrl = import.meta.env.BASE_BACKEND_URL
+  const baseUrl = import.meta.env.VITE_BASE_BACKEND_URL
   const res = await axios.post(`${baseUrl}/api/auth/signin`, data);
   return res.data;
 };
