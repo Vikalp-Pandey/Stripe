@@ -7,7 +7,7 @@ export const checkoutSession = async (req:Request,res:Response,next:NextFunction
    if(!sessionUrl){
      return res.json({Error:"Session not found"})
    }
-   return res.json({"url":sessionUrl});
+   return res.redirect(sessionUrl);
 }
 
 export const successResponse = async (req:Request,res:Response,next:NextFunction)=>{

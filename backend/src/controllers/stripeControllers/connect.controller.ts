@@ -1,3 +1,5 @@
+
+import env from "../../env";
 import { asyncHandler, logger, sendRedirect, sendResponse } from "../../handlers/handler";
 import stripeService from "../../services/payment/stripe.connect";
 import {Request,Response} from "express";
@@ -15,13 +17,12 @@ export const onboardSeller = asyncHandler( async (req:Request,res:Response) => {
 export const onboardingSuccessRedirect = asyncHandler(async (req: Request, res: Response) => {
 
     const { accountId } = req.params;
-    return sendResponse(res,200, "Your Seller Account has been Successfully Created")
+    // return sendResponse(res,200, "Your Seller Account has been Successfully Created")
 
     // Redirect to Frontend Url
-
-            // return res.redirect(
-            //     `http://localhost:3000/onboarding/success?accountId=${accountId}`
-            // );
+            return sendRedirect(
+                res,`${env.BASE_BACKEND_URL}/onboarding/success?accountId=${accountId}`
+            );
 })
 
 export const refreshOnBoarding = asyncHandler(async (req:Request,res:Response)  => {
