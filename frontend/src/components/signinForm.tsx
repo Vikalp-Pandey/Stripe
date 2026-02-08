@@ -26,11 +26,13 @@ export default function SigninForm() {
   };
 
   const handleGithubSignin = () => {
-    window.location.href = "http://localhost:3000/api/auth/github"; // backend OAuth route
+    const baseUrl = import.meta.env.BASE_BACKEND_URL
+    window.location.href = `${baseUrl}/api/auth/github` ; // backend OAuth route
   };
 
   const handleGoogleSignin = () => {
-    window.location.href = "http://localhost:3000/api/auth/google"; // backend OAuth route
+    const baseUrl = import.meta.env.BASE_BACKEND_URL
+    window.location.href = `${baseUrl}/api/auth/google`; // backend OAuth route
   };
 
   return (

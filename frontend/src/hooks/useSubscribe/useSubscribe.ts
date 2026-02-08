@@ -4,7 +4,7 @@ import axios from "axios";
 const useSubscribe = () => {
   const mutation = useMutation({
     mutationFn: async () => {
-      const baseUrl = "http://localhost:3000";
+      const baseUrl = import.meta.env.BASE_BACKEND_URL;
       const res = await axios.get(`${baseUrl}/api/payment/checkout-payment`);
       return res.data;
     },

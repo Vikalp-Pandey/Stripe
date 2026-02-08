@@ -16,7 +16,7 @@ export const signupSchema = z
 export type SignupFormValues = z.infer<typeof signupSchema>;
 
 export const signupUser = async (data: SignupFormValues) => {
-  const baseUrl = "http://localhost:3000"
+  const baseUrl = import.meta.env.BASE_BACKEND_URL
   const res = await axios.post(`${baseUrl}/api/auth/signup`, data);
   return res.data;
 };
@@ -29,7 +29,7 @@ export const signinSchema = z.object({
 export type SigninFormValues = z.infer<typeof signinSchema>;
 
 export const signinUser = async (data: SigninFormValues) => {
-  const baseUrl = "http://localhost:3000"
+  const baseUrl = import.meta.env.BASE_BACKEND_URL
   const res = await axios.post(`${baseUrl}/api/auth/signin`, data);
   return res.data;
 };
