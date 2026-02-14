@@ -1,20 +1,22 @@
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+// import axios from "axios";
+import createSubscription from "./api";
 
 const useSubscribe = () => {
   const mutation = useMutation({
-    mutationFn: async () => {
-      const baseUrl = import.meta.env.VITE_BASE_BACKEND_URL;
-      const res = await axios.get(`${baseUrl}/api/payment/checkout-payment`);
-      return res.data;
-    },
+    
+    mutationFn: createSubscription,
     onSuccess: (data) => {
+       console.log("FRONTEND RECEIVED:", data);
       // Redirect to Stripe Checkout (changing the window location)
-      window.location.href = data.url;
+      window.location.href = data?.url;
     },
+    onError:(e)=>{
+   console.log(e);
+    }
   });
 
-  return mutation;
+  return {subscribe: mutation};
 };
 
 export default useSubscribe;

@@ -12,7 +12,7 @@ type FormData = {
 };
 
 export default function SubscriptionPurchase() {
-  const subscribe = useSubscribe();
+  const {subscribe} = useSubscribe();
 
   const {
     handleSubmit,

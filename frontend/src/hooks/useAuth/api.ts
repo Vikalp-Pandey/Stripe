@@ -16,9 +16,19 @@ export const signupSchema = z
 export type SignupFormValues = z.infer<typeof signupSchema>;
 
 export const signupUser = async (data: SignupFormValues) => {
-  const baseUrl = import.meta.env.BASE_BACKEND_URL
+  try{
+  const baseUrl = import.meta.env.VITE_BASE_BACKEND_URL;
+  console.log(baseUrl)
   const res = await axios.post(`${baseUrl}/api/auth/signup`, data);
   return res.data;
+}catch(error:any){
+  if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message || "Something went wrong"
+      );
+    }
+    throw new Error("Unexpected error occurred");
+}
 };
 
 export const signinSchema = z.object({

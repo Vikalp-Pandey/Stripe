@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { signupSchema, type SignupFormValues } from "../hooks/useAuth/api";
 import { useAuth } from "../hooks/useAuth/useAuth";
 import { Link } from "react-router-dom";
+import type { AxiosError } from "axios";
 
 
 
@@ -136,7 +137,7 @@ export default function SignupForm() {
             {/* Error */}
             {signup.isError && (
               <p className="text-center text-sm text-red-400">
-                User Already Exists.
+                  {(signup.error as AxiosError<{ message: string }>)?.response?.data?.message || "Something went wrong"}
               </p>
             )}
 
