@@ -12,7 +12,7 @@ const useSubscribe = () => {
       window.location.href = data?.url;
     },
     onError:(e)=>{
-   console.log(e);
+         console.log(e);
     }
   });
 
