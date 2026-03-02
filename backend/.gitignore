@@ -4,7 +4,9 @@ node_modules
 
 # Ignore environment variable files
 .env.local
+.env.prod
 stripe.exe
 pnpm-lock.yaml
+
 
 

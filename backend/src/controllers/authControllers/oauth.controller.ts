@@ -1,59 +1,211 @@
-import { asyncHandler, logger, sendRedirect, sendResponse } from "../../handlers/handler";
-import oauthService from "../../services/auth/oauth.service";
-import userService from "../../services/auth/user.service";
+import jwtService from '../../services/auth/jwt.service';
+import env from '../../env';
+import {
+  asyncHandler,
+  logger,
+  sendCookie,
+  sendRedirect,
+  sendResponse,
+} from '../../handlers/handler';
+import oauthService from '../../services/auth/oauth.service';
+import userService from '../../services/auth/user.service';
 
-import { Request,Response,NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 
 
-export const getGithubURL = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
-    const githubOauthUrl = await oauthService.getGithubURL();
-    logger("INFO","GithubOauthURL:",githubOauthUrl)
-    return sendRedirect(res,githubOauthUrl)
-})
+const handleAuthResponse = (res: Response, user: any, token:string|undefined, frontendState: string) => {
+  const isProduction = env.NODE_ENV === 'production';
 
-export const signinwithGithub = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
-    const {code}= req.query;
-    
-    if(typeof code == "string")
-        {
-            const user = await oauthService.signinwithGithub(code)
-            const newUser = await userService.createUser(user)
-            // return sendResponse(res,200,"User Signed In Successfully",newUser)
-            return sendRedirect(res,"http://localhost:5174/payement")
-        }
-    return sendResponse(res,400,"Invalid Code Type",{
-        code: typeof code
-    })
-})
+  if (isProduction) {
+    return sendResponse(res, 200, 'Authentication Successful', {
+      message: "Production Mode: Frontend not ready, returning JSON.",
+      user, // Returns the full user field as requested
+      token,
+      frontendState
+    });
+  }
+  return sendRedirect(
+    res,
+    `${env.ALLOWED_ORIGINS}/payment?state=${frontendState}`
+  );
 
-export const getGoogleURL = async(req:Request,res:Response,next:NextFunction)=>{
-   const googleOauthUrl = await oauthService.getGoogleURL()
-   logger("INFO","Google Url",googleOauthUrl)
-   return sendRedirect(res,googleOauthUrl)
-}
-
-export const signinwithGoogle = async (req:Request,res:Response,next:NextFunction)=>{
-    const {code}=req.query
-
-    if(typeof code=="string"){
-       const user = await oauthService.signinwithGoogle(code);
-       logger("INFO","User: ",user)
-    //    return sendResponse(res,200,"User signed in successfully",user)
-       return sendRedirect(res,"http://localhost:5174/payement")
-    }
-    return sendResponse(res,400,"Invalid Code Type",{
-        code: typeof code
-    })
-}
-export const signwithGoogle = async()=>{
-
+  
 };
 
+
+
+export const getGithubURL = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const githubOauthUrl = await oauthService.getGithubURL();
+    logger('INFO', 'GithubOauthURL:', githubOauthUrl);
+    return sendRedirect(res, githubOauthUrl);
+  }
+);
+
+export const signinwithGithub = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { code } = req.query;
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (typeof code !== 'string') {
+      return sendResponse(res, 400, 'Invalid Code Type', { code: typeof code });
+    }
+    // Exchange code for GitHub user info
+    const githubUser = await oauthService.signinwithGithub(code);
+
+    logger('INFO', 'GitHub User Info', githubUser);
+
+    // Create or fetch existing user
+    // let newUser = await userService.createUser(githubUser);
+    let isExisting = await userService.findUser({ email: githubUser.email });
+    logger('INFO', '32 :GitHub User Info', isExisting);
+
+    if (isExisting) {
+      logger('ERROR', 'User with this email exists.');
+      // Sign a temporary JWT containing username/email for frontend avatar
+      const frontendState = await jwtService.signJwt(
+        { name: isExisting.name, email: isExisting.email },
+        env.ACCESS_SECRET,
+        { expiresIn: '10m' }
+      );
+      const token = await jwtService.findandreissueToken(isExisting.email);
+      logger('INFO', 'Access Token:', token);
+
+      if (!token) {
+        return sendResponse(res,404,"Token not Found")
+      }
+      sendCookie(res, 'accessToken', token, {
+          maxAge: 1000 * 60 * 10,
+          sameSite: 'none',
+          secure: isProduction,
+        });
+      logger('INFO', 'Frontend State', frontendState);
+      return handleAuthResponse(res, isExisting, token, frontendState);
+    }
+
+    let newUser = await userService.createUser(githubUser);
+    // Create JWT token for authentication
+    const token = await jwtService.signJwt(
+      { id: newUser._id },
+      env.ACCESS_SECRET,
+      { expiresIn: '7d' }
+    );
+    console.log(token);
+    newUser.access_token = token;
+
+    sendCookie(res, 'accessToken', token, {
+      maxAge: 1000 * 60 * 10,
+      sameSite: 'none',
+      secure: isProduction,
+    });
+    req.cookies.accessToken = token;
+
+    // Create state JWT with username/email for frontend (avatar letter)
+    const frontendState = await jwtService.signJwt(
+      { name: newUser.name, email: newUser.email },
+      env.ACCESS_SECRET,
+      { expiresIn: '10m' }
+    );
+
+    logger('INFO', 'Frontend State', frontendState);
+
+    return handleAuthResponse(res,newUser,token,frontendState)
+  }
+);
+
+export const getGoogleURL = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const googleOauthUrl = await oauthService.getGoogleURL();
+  logger('INFO', 'Google Url', googleOauthUrl);
+  return sendRedirect(res, googleOauthUrl);
+};
+
+export const signinwithGoogle = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { code } = req.query;
+    const isProduction = env.NODE_ENV === 'production';
+
+    if (typeof code !== 'string') {
+      return sendResponse(res, 400, 'Invalid Code Type', { code: typeof code });
+    }
+
+    // 1. Exchange code for Google user info
+    const googleUser = await oauthService.signinwithGoogle(code);
+    logger('INFO', 'Google User Info', googleUser);
+
+    // 2. Check if user already exists
+    let isExisting = await userService.findUser({ email: googleUser.email });
+    logger('INFO', 'Checking for existing user:', isExisting);
+
+    if (isExisting) {
+      logger('INFO', 'User with this email exists. Logging in...');
+
+      // Sign a temporary JWT for frontend state (UI/Avatar)
+      const frontendState = await jwtService.signJwt(
+        { name: isExisting.name, email: isExisting.email },
+        env.ACCESS_SECRET,
+        { expiresIn: '10m' }
+      );
+
+      // Reissue existing access token
+      const token = await jwtService.findandreissueToken(isExisting.email);
+      logger('INFO', 'Reissued Access Token:', token);
+
+      if (!token) {
+        return sendResponse(res, 404, "Token not Found");
+      }
+
+      sendCookie(res, 'accessToken', token, {
+        maxAge: 1000 * 60 * 10,
+        sameSite: 'none',
+        secure: isProduction, // Consistent with GitHub logic
+      });
+
+      return handleAuthResponse(res, isExisting, token, frontendState);
+    }
+
+    // 3. If user doesn't exist, create a new one
+    let newUser = await userService.createUser(googleUser);
+
+    // Create new 7-day Access Token
+    const token = await jwtService.signJwt(
+      { id: newUser._id },
+      env.ACCESS_SECRET,
+      { expiresIn: '7d' }
+    );
+    
+    newUser.access_token = token;
+
+    sendCookie(res, 'accessToken', token, {
+      maxAge: 1000 * 60 * 10,
+      sameSite: 'none',
+      secure: isProduction,
+    });
+
+    // Manually set cookie in request object if needed for immediate middleware
+    req.cookies.accessToken = token;
+
+    // Create frontend state JWT
+    const frontendState = await jwtService.signJwt(
+      { name: newUser.name, email: newUser.email },
+      env.ACCESS_SECRET,
+      { expiresIn: '10m' }
+    );
+
+    logger('INFO', 'Frontend State for New User', frontendState);
+
+    // 4. Handle Production JSON response vs Development Redirect
+    return handleAuthResponse(res, newUser, token, frontendState);
+  }
+);
+
 const oauthController = {
-    getGithubURL,
-    signinwithGithub,
-    getGoogleURL,
-    signinwithGoogle
-}
+  getGithubURL,
+  signinwithGithub,
+  getGoogleURL,
+  signinwithGoogle,
+};
 
 export default oauthController;

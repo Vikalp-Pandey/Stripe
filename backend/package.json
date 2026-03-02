@@ -1,12 +1,15 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "backend-masterclass",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-  "build": "tsc",
-  "start": "ts-node -r tsconfig-paths/register src/index.ts"
-},
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "build": "tsc",
+    "start": "ts-node -r tsconfig-paths/register src/index.ts"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.955.0",
     "@aws-sdk/s3-request-presigner": "^3.955.0",
@@ -17,6 +20,7 @@
     "bcryptjs": "^3.0.3",
     "chalk": "^5.6.2",
     "cloudinary": "^2.8.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
@@ -32,6 +36,7 @@
   },
   "devDependencies": {
     "@types/aws-sdk": "^2.7.4",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
@@ -41,6 +46,7 @@
     "@types/nodemailer": "^7.0.4",
     "@types/react": "^19.2.7",
     "nodemon": "^3.1.11",
+    "prettier": "^3.8.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"

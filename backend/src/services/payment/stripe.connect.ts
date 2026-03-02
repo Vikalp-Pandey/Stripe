@@ -1,17 +1,16 @@
-import {stripe} from "./stripe"
+import { stripe } from './stripe';
 
 // Create a Connected Account
-export const createConnectedAccount = async (email:string) => {
-    return await stripe.accounts.create({
-     type: "express",
-     email,
-        capabilities:{
-            card_payments:{requested:true},
-            transfers:{requested:true}
-        }
-    })
-}
-
+export const createConnectedAccount = async (email: string) => {
+  return await stripe.accounts.create({
+    type: 'express',
+    email,
+    capabilities: {
+      card_payments: { requested: true },
+      transfers: { requested: true },
+    },
+  });
+};
 
 /*
 {
@@ -165,92 +164,91 @@ INFO: On Boarding Url
 https://connect.stripe.com/setup/e/acct_1SsRUuGguNjWo6CL/XRBtGykNfIUY
 */
 
-
-
-
 // Generate onboarding or refresh link
-export const createAccountLink = async (accountId:string) => {
-    const link = await stripe.accountLinks.create({
-        account:accountId,
-        refresh_url: `http://localhost:3000/api/payment/onboarding/refresh/${accountId}`,
+export const createAccountLink = async (accountId: string) => {
+  const link = await stripe.accountLinks.create({
+    account: accountId,
+    refresh_url: `http://localhost:3000/api/payment/onboarding/refresh/${accountId}`,
 
-        // Redirect Url (where stripe redirects you after you created a seller onboarding account)
-        return_url: `http://localhost:3000/api/payment/onboarding/success/${accountId}`,
-        type: "account_onboarding",
-    })
+    // Redirect Url (where stripe redirects you after you created a seller onboarding account)
+    return_url: `http://localhost:3000/api/payment/onboarding/success/${accountId}`,
+    type: 'account_onboarding',
+  });
 
-    return link.url;
-}
+  return link.url;
+};
 
+export const getAccountStatus = async (accountId: string) => {
+  const account = await stripe.accounts.retrieve(accountId);
 
-export const getAccountStatus = async (accountId:string) => {
-    const account = await stripe.accounts.retrieve(accountId);
+  // Retrieve balance of seller Account ({} means empty params)
+  const balance = await stripe.balance.retrieve(
+    {},
+    { stripeAccount: accountId }
+  );
 
-    // Retrieve balance of seller Account ({} means empty params)
-    const balance = await stripe.balance.retrieve({},{stripeAccount:accountId});
+  // const account = await stripe.accounts.retrieve(destinationAccountId);
 
-    // const account = await stripe.accounts.retrieve(destinationAccountId);
+  // if (!account.capabilities?.transfers || account.capabilities.transfers !== "active") {
+  // throw new Error("Seller account is not eligible to receive transfers yet.");
+  // }
 
-    // if (!account.capabilities?.transfers || account.capabilities.transfers !== "active") {
-    // throw new Error("Seller account is not eligible to receive transfers yet.");
-    // }
+  return {
+    balance: balance,
+    detail: account,
+    accoutType: account.type,
+    id: account.id,
+    email: account.email,
+    chargesEnabled: account.charges_enabled,
+    payoutsEnables: account.payouts_enabled,
+    detailsSubmitted: account.details_submitted,
+    requirements: account.requirements,
+    capabilites: account.capabilities,
+  };
+};
 
-    return {
-        balance:balance,
-        detail:account,
-        accoutType:account.type,
-        id:account.id,
-        email:account.email,
-        chargesEnabled: account.charges_enabled,
-        payoutsEnables: account.payouts_enabled,
-        detailsSubmitted: account.details_submitted,
-        requirements:account.requirements,
-        capabilites:account.capabilities,
+export const createPayment = async (amount: string, currency: string) => {
+  // Stripe Expects Amount to be Integer (99.99$ to 9999)
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: Math.round(parseFloat(amount) * 100),
+    currency,
+    automatic_payment_methods: {
+      enabled: true,
+      allow_redirects: 'never',
+    },
+    // Then you can immediately confirm it with a test card (pm_card_visa) and no return_url is required.
+  });
 
+  const confirmedPaymentIntent = await stripe.paymentIntents.confirm(
+    paymentIntent.id,
+    {
+      payment_method: 'pm_card_visa', // Stripe test card PaymentMethod
     }
-}
-
-
-export const createPayment = async (amount:string,currency:string) => {
-
-    // Stripe Expects Amount to be Integer (99.99$ to 9999)
-    const paymentIntent = await stripe.paymentIntents.create({
-        amount:  Math.round(parseFloat(amount)*100),
-        currency,
-        automatic_payment_methods:{
-            enabled:true,
-            allow_redirects: "never", 
-        }
-        // Then you can immediately confirm it with a test card (pm_card_visa) and no return_url is required.
-    })
-  
-    const confirmedPaymentIntent = await stripe.paymentIntents.confirm(
-        paymentIntent.id,
-        {
-        payment_method: "pm_card_visa", // Stripe test card PaymentMethod
-        }
-    );
-    // Step 3: Return the confirmed PaymentIntent
-    return confirmedPaymentIntent;
-      
-}
+  );
+  // Step 3: Return the confirmed PaymentIntent
+  return confirmedPaymentIntent;
+};
 
 //^ For sending money from the platform (main buisness account ) to sellers
-export const createTransfer = async (amount:string,currency:string,destinationAccountId:string) => {
-    const transfer = await stripe.transfers.create({
-        amount: Math.round(parseFloat(amount)*100),
-        currency,
-        destination: destinationAccountId,
-    })
-    return transfer;
-}
+export const createTransfer = async (
+  amount: string,
+  currency: string,
+  destinationAccountId: string
+) => {
+  const transfer = await stripe.transfers.create({
+    amount: Math.round(parseFloat(amount) * 100),
+    currency,
+    destination: destinationAccountId,
+  });
+  return transfer;
+};
 
 const stripeService = {
-    createConnectedAccount,
-    createAccountLink,
-    getAccountStatus,
-    createPayment,
-    createTransfer
-}
+  createConnectedAccount,
+  createAccountLink,
+  getAccountStatus,
+  createPayment,
+  createTransfer,
+};
 
 export default stripeService;
